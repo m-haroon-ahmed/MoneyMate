@@ -1,0 +1,23 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Money Mate's own data files — personal data should NOT be uploaded to GitHub
+money_mate_data.json
+money_mate_data.backup.json
+money_mate_data.json.tmp
+*.corrupted
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
