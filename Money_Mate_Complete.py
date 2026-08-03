@@ -535,7 +535,7 @@ btn_delete.pack(side="left", padx=4)
 # jo confusing tha kyunke button poore action-bar mein records ke sath tha.
 # Ab yeh poora record/history reset karta hai (confirmation ke sath), aur form
 # clear karne wala chota button ab form ke andar (Amount field ke neeche) hai.
-btn_clear = tk.Button(buttons_row, text="Clear All", command=lambda: reset_all_data(),
+btn_clear = tk.Button(buttons_row, text="Clear Shown", command=lambda: reset_all_data(),
                       bg="#922b21", fg="white", font=("Segoe UI", 11, "bold"),
                       padx=14, pady=7, relief="flat", cursor="hand2")
 btn_clear.pack(side="left", padx=4)
@@ -1514,25 +1514,42 @@ def delete_transaction():
     messagebox.showinfo("Success", "Transaction deleted successfully!")
 
 def reset_all_data():
-    """Action-bar wala 'Clear All' button — poori transaction history delete karta hai.
-    Budgets aur categories intact rehti hain, sirf transactions saaf hoti hain."""
+    """Action-bar wala 'Clear All' button.
+    FIX: pehle yeh HAMESHA poori transaction history delete kar deta tha,
+    chahe koi bhi filter active ho (jaise 'August 2026' ya '20 July se 30 July')
+    — matlab agar sirf August dekh rahe ho aur Clear All dabao, to July ka
+    data bhi ghalti se delete ho jata tha. Ab yeh SIRF wahi transactions
+    delete karta hai jo abhi table mein show ho rahi hain (currently active
+    Filter bar range + Search + Amount range ke mutabiq) — baqi records
+    (jo filter se bahar hain) mehfooz rehte hain."""
+    to_delete = get_filtered_transactions()
+    if not to_delete:
+        messagebox.showinfo("Nothing to Clear", "There are no transactions matching the current filter/search to delete.")
+        return
+
+    delete_ids = {t["id"] for t in to_delete}
+    period_text = get_filter_period_text()
+
     confirm = messagebox.askyesno(
         "Confirm Reset",
-        "This will permanently delete ALL your transactions (income + expense)!\n\n"
-        "Your budgets and categories will be preserved.\n\nAre you sure you want to reset?"
+        f"This will permanently delete {len(to_delete)} transaction(s) currently shown "
+        f"(filter: {period_text})!\n\n"
+        "Transactions outside this filter/search will be kept. "
+        "Your budgets and categories will be preserved.\n\n"
+        "Are you sure you want to delete these?"
     )
     if not confirm:
         return
 
     data = load_data()
-    data["transactions"] = []
+    data["transactions"] = [t for t in data["transactions"] if t["id"] not in delete_ids]
     save_data(data)
 
     global selected_id
     selected_id = None
     refresh_all()
     clear_fields()
-    messagebox.showinfo("Success", "All transaction records have been cleared!")
+    messagebox.showinfo("Success", f"{len(delete_ids)} transaction(s) cleared!")
 
 def clear_search():
     search_entry.delete(0, tk.END)
