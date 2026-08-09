@@ -1,7 +1,7 @@
 # ============================================================
-# MONEY MATE - COMPLETE EDITION (Improved)
+# MONEY MATE - COMPLETE EDITION 
 # Features: Income Tracking, Date Filters, Budget Alerts, Charts,
-#           Custom Categories, All-Time Totals, Scrollable Budgets
+# Custom Categories, All-Time Totals, Scrollable Budgets
 # ============================================================
 
 import json
